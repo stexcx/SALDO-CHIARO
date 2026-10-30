@@ -20,8 +20,10 @@ jobs:
       - name: Installa SDK Android 35
         run: |
           echo "ANDROID_HOME=$ANDROID_HOME"
-          yes | sdkmanager --licenses > /dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0"
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -type f -name sdkmanager | head -n 1)"
+          test -n "$SDKMANAGER" || { echo "sdkmanager non trovato"; exit 1; }
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-35" "build-tools;35.0.0"
       - name: Compila APK
         run: gradle --no-daemon :app:assembleDebug
       - uses: actions/upload-artifact@v4
