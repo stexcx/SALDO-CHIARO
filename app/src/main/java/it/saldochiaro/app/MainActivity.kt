@@ -128,7 +128,7 @@ fun SaldoChiaro() {
         Scaffold(bottomBar = {
             NavigationBar {
                 listOf("Panoramica", "Ricorrenti", "Movimenti", "Impostazioni").forEachIndexed { idx, label ->
-                    NavigationBarItem(selected = page == idx, onClick = { page = idx },
+                    NavigationBarItem(selected = page == idx || (page == 4 && idx == 3), onClick = { page = idx },
                         icon = { Text(listOf("⌂","↻","≡","⚙")[idx], fontSize = 21.sp) },
                         label = { Text(label, fontSize = 10.sp, maxLines = 1) })
                 }
@@ -158,7 +158,8 @@ fun SaldoChiaro() {
                             Text("Da verificare: aumenti", fontWeight = FontWeight.Bold, color = Color(0xFFB04444))
                             increases.forEach { Text("${it.name}: ${money(it.previous)} → ${money(it.cents)}") }
                         }
-                        Button(onClick = { picker.launch(arrayOf("text/*", "application/csv")) }) { Text("Importa movimenti CSV") }
+                        Button(onClick = { page = 4 }) { Text("Conti e carte") }
+                        OutlinedButton(onClick = { picker.launch(arrayOf("text/*", "application/csv")) }) { Text("Importa movimenti CSV") }
                     }
                     1 -> {
                         Text("Abbonamenti rilevati", fontSize = 22.sp, fontWeight = FontWeight.Bold)
@@ -180,6 +181,28 @@ fun SaldoChiaro() {
                                 color = if (m.cents < 0) navy else mint)
                         } }
                     }
+                    4 -> {
+                        Text("Conti e carte", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = navy)
+                        Text("Stato dei collegamenti bancari", color = Color.Gray)
+                        Panel {
+                            Text("Nessun conto collegato", fontWeight = FontWeight.Bold, color = navy)
+                            Text("Questa demo è offline e non può accedere ai conti o alle carte. Il collegamento automatico richiederà un partner Open Banking autorizzato.", fontSize = 14.sp)
+                        }
+                        listOf("Conto BancoPosta", "Postepay Evolution", "Postepay Standard", "Altre banche europee").forEach { bank ->
+                            Panel {
+                                Text(bank, fontWeight = FontWeight.Bold, fontSize = 17.sp)
+                                Text("Non collegato", color = Color(0xFFA34C28), fontSize = 13.sp)
+                                Text("Collegamento automatico non disponibile in questa versione.", fontSize = 13.sp, color = Color.Gray)
+                            }
+                        }
+                        Panel {
+                            Text("Alternativa: importazione manuale", fontWeight = FontWeight.Bold)
+                            Text("Puoi provare un file CSV di esempio con colonne Data, Descrizione e Importo. Non inserire password o codici PosteID.", fontSize = 14.sp)
+                            Text("Attenzione: i dati CSV vengono conservati sul telefono senza cifratura dedicata; usa solo movimenti fittizi in questa demo.", fontSize = 13.sp, color = Color(0xFFA34C28))
+                            Button(onClick = { picker.launch(arrayOf("text/*", "application/csv")) }) { Text("Importa CSV di prova") }
+                        }
+                        OutlinedButton(onClick = { page = 0 }) { Text("Torna alla panoramica") }
+                    }
                     else -> {
                         Text("Impostazioni e privacy", fontSize = 22.sp, fontWeight = FontWeight.Bold)
                         Panel {
@@ -187,6 +210,7 @@ fun SaldoChiaro() {
                             Text("Questa versione non ha il permesso Internet. Nessun dato viene inviato a server.")
                             Text("L'importazione CSV è sperimentale: funziona con intestazioni semplici; controlla sempre i risultati.")
                         }
+                        Button(onClick = { page = 4 }) { Text("Apri Conti e carte") }
                         OutlinedButton(onClick = { save(demo()); notice = "Dati dimostrativi ripristinati" }) { Text("Ripristina demo") }
                         OutlinedButton(onClick = { save(emptyList()); notice = "Movimenti cancellati dal dispositivo" }) { Text("Cancella dati") }
                     }
