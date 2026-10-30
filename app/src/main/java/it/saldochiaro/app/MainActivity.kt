@@ -100,7 +100,7 @@ fun SaldoChiaro() {
             val raw = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }.orEmpty()
             if (raw.length > 2_000_000) throw IllegalArgumentException("File troppo grande")
             val lines = raw.lines().filter { it.isNotBlank() }
-            val sep = if (lines.firstOrNull()?.count { it == ';' } ?: 0 > lines.firstOrNull()?.count { it == ',' } ?: 0) ';' else ','
+            val sep = if ((lines.firstOrNull()?.count { it == ';' } ?: 0) > (lines.firstOrNull()?.count { it == ',' } ?: 0)) ';' else ','
             val header = lines.first().split(sep).map { it.trim().lowercase(Locale.ITALY) }
             fun col(vararg names: String): Int = header.indexOfFirst { it in names }
             val d = col("data", "date", "data operazione")
